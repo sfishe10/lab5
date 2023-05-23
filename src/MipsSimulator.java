@@ -5,13 +5,13 @@ import java.util.Map;
 public class MipsSimulator {
     private final int[] datamem = new int[8192];
     private int pc = 0;
-    private int ghr_size = 2;
+    private int ghr_size;
     private int[] ghr = new int[ghr_size];
     private int[] counters = new int[2];
     private final LinkedHashMap<String, Integer> regs = new LinkedHashMap<>();
     private final ArrayList<Instruction> insts;
 
-    public MipsSimulator(ArrayList<Instruction> insts) {
+    public MipsSimulator(ArrayList<Instruction> insts, int ghr_size) {
 
         // set all registers to hold 0
         for (String reg : utility.getRegList().keySet()) {
@@ -19,7 +19,8 @@ public class MipsSimulator {
         }
 
         this.insts = insts;
-        
+        this.ghr_size = ghr_size;
+
         for (int i = 0; i < ghr_size; i++) {
             ghr[i] = 0;
         }

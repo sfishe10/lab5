@@ -17,14 +17,20 @@ public class lab5 {
 
         ArrayList<Instruction> insts = utility.getInstructions(file, labels);
 
-        MipsSimulator mipsim = new MipsSimulator(insts);
+        int ghr_size;
 
         // SCRIPT MODE
         File script = new File(args[1]);
 
         if (args.length == 3) {
-            mipsim.setGhr_size(Integer.parseInt(args[2]));
+            ghr_size = Integer.parseInt(args[2]);
         }
+        else {
+            ghr_size = 2;
+        }
+
+        MipsSimulator mipsim = new MipsSimulator(insts, ghr_size);
+
         Scanner scnr = new Scanner(script);
 
         while ( scnr.hasNext() ) {

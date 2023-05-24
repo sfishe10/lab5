@@ -6,8 +6,13 @@ public class MipsSimulator {
     private final int[] datamem = new int[8192];
     private int pc = 0;
     private int ghr_size;
-    private int[] ghr = new int[ghr_size];
-    private int[] counters = new int[2];
+    private int ghr = 0;
+    // if branch is not taken, left shift
+    // if branch is taken, left shift AND set lsb to 1
+    // in both cases, set bit to the left of ghr size to 0
+    private int tot_predictions = 0;
+    private int acc_predictions = 0;
+    private int[] predictors = new int[(int) Math.pow(2, ghr_size)];
     private final LinkedHashMap<String, Integer> regs = new LinkedHashMap<>();
     private final ArrayList<Instruction> insts;
 
@@ -21,16 +26,9 @@ public class MipsSimulator {
         this.insts = insts;
         this.ghr_size = ghr_size;
 
-        for (int i = 0; i < ghr_size; i++) {
-            ghr[i] = 0;
-        }
         for (int i=0; i < 2; i++) {
-            counters[i] = 0;
+            predictors[i] = 0;
         }
-    }
-
-    public void setGhr_size(int bits) {
-        this.ghr_size = bits;
     }
 
     public void setReg(String reg, int num) {
@@ -40,7 +38,8 @@ public class MipsSimulator {
     }
 
     public void b() {
-
+        System.out.println("accuracy " + ((acc_predictions/tot_predictions)*100) + "% (" +
+                acc_predictions + " correct predictions, " + tot_predictions + " predictions)");
     }
 
     public static void h() {

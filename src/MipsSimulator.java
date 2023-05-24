@@ -6,6 +6,12 @@ public class MipsSimulator {
     private final int[] datamem = new int[8192];
     private int pc = 0;
     private int ghr_size;
+    private int correct;
+    private int incorrect;
+    private int prev_prediction;
+    private boolean branchTaken;
+  //  private int[] bp_table = new int[ghr_size];
+    private int[] counters = new int[2];
     private int ghr = 0;
     // if branch is not taken, left shift
     // if branch is taken, left shift AND set lsb to 1
@@ -26,6 +32,9 @@ public class MipsSimulator {
         this.insts = insts;
         this.ghr_size = ghr_size;
 
+    //    for (int i = 0; i < ghr_size; i++) {
+     //       bp_table[i] = 0;
+     //   }
         for (int i=0; i < 2; i++) {
             predictors[i] = 0;
         }
@@ -77,6 +86,7 @@ public class MipsSimulator {
     public void s() {
         if (pc < insts.size()) {
             Instruction inst = insts.get(pc);
+            branchTaken = false;
             switch (inst.getId()) {
                 case ("add"):
                     int sum = regs.get(((R)inst).getRs()) + regs.get(((R)inst).getRt());
@@ -135,16 +145,20 @@ public class MipsSimulator {
                 case ("beq"):
                     if (regs.get(((I)inst).getRs()) == regs.get(((I)inst).getRt())){
                         pc +=  1 + ((I)inst).getImm();
+                        branchTaken = true;
                         break;
                     }
                     else {
+                        branchTaken = false;
                         pc++;
                     }
                 case ("bne"):
                     if (regs.get(((I)inst).getRs()) != regs.get(((I)inst).getRt())){
                         pc +=  1 + ((I)inst).getImm();
+                        branchTaken = false;
                     }
                     else {
+                        branchTaken = true;
                         pc++;
                     }
                     break;
@@ -160,6 +174,38 @@ public class MipsSimulator {
             }
 
         }
+        prev_prediction = predictors[ghr];
+        if (branchTaken == true && (prev_prediction == 2 || prev_prediction == 3)) {
+            correct++;
+            //update bp_table
+            if (prev_prediction != 3){
+                predictors[ghr] = prev_prediction + 1;
+            }
+        }
+        else  if (branchTaken == false && (prev_prediction == 0 || prev_prediction == 1)) {
+            correct++;
+            if (prev_prediction != 3){
+                predictors[ghr] = prev_prediction + 1;
+            }
+
+        }
+        else  if (branchTaken == true && (prev_prediction == 0 || prev_prediction == 1)) {
+            incorrect++;
+            if (prev_prediction != 0){
+                predictors[ghr] = prev_prediction - 1;
+            }
+            
+        }
+        else  if (branchTaken == false && (prev_prediction == 2 || prev_prediction == 3)) {
+            incorrect++;
+            if (prev_prediction != 0){
+                predictors[ghr] = prev_prediction - 1;
+            }
+            
+        }
+        
+        
+
 
     }
 

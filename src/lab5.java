@@ -2,6 +2,8 @@
 Names: Sadie Fisher and Angelika Canete
 Section: 01
 Description: This program simulates an environment to run MIPS programs.
+             It uses a GHR as an index into an array of 2-bit values
+             to keep track of branch predictions.
  */
 
 
